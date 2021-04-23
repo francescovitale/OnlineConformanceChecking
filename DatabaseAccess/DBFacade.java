@@ -1,6 +1,10 @@
 package DatabaseAccess;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import PMLogic.Activity;
 import PMLogic.ActivityInstance;
@@ -9,138 +13,146 @@ import PMLogic.ProcessInstance;
 import PMLogic.ProcessModel;
 
 public class DBFacade {
+	private Connection Conn;
 public
-	DBFacade() {}
-	public ArrayList<ProcessModel> getProcessList(){
-		/*ProcessModel PM = new ProcessModel(ProcessName);
-		ArrayList<Activity> ActivityList = getActivityList(ProcessName);
-		PM.setAL(ActivityList);
-		ArrayList<ProcessInstance> ProcessInstanceList = getProcessInstanceList();
-		ArrayList<ProcessInstance> ProcessInstanceListForPM = new ArrayList<ProcessInstance>();
-		boolean found = true;
-		while(!found) {
-			found = false;
-			for(int i=0;i<ProcessInstanceList.size();i++)
-				if(ProcessInstanceList.get(i).getP().getName().equals(ProcessName)) {
-					found = true;
-					ProcessInstanceListForPM.add(ProcessInstanceList.get(i));
-				}		
+	DBFacade() {
+		try {
+			Conn = getConnection();
+		} catch (SQLException e) {
+			System.out.println("Couldn't connect to the database");
 		}
-		PM.setPI(ProcessInstanceListForPM);
-		return PM;*/
+	}
+
+	public void closeConnection() throws SQLException {
+		Conn.close();
+	}
+	private Connection getConnection() throws SQLException {
+		 Connection conn = null;
+		 Properties connectionProps = new Properties();
+		 connectionProps.put("user", "root");
+		 connectionProps.put("password", "root");
+		 conn = DriverManager.getConnection(
+			     "jdbc:" + "mysql" + "://" + "127.0.0.1" +":" + "3306" + "/",connectionProps);
+
+		 return conn;
+	}
+	public ArrayList<ProcessModel> getProcessList() throws SQLException{
 		
-		ArrayList<ProcessModel> PM = new ArrayList<ProcessModel>();
+		ArrayList<ProcessModel> PM;
 		
-		// fetch the process models from the DB
-		
-		PM.add(new ProcessModel("trial_bpmn")); // fake the fetch
+		PM = ProcessDAO.getProcessList(Conn);
 		
 		return PM;
 		
 		
 	}
-	public ArrayList<Activity> getActivityList(ArrayList<ProcessModel> P){
-		ArrayList<Activity> A = new ArrayList<Activity>();
+	public ArrayList<Activity> getActivityList(ArrayList<ProcessModel> PMList) throws SQLException{
+		ArrayList<Activity> AList;
 		
-		// fetch the activities from the DB
-		
-		// for each activity find, among all the process models, the one that has the same name as the foreign key has
-		
-		A.add(new Activity("a",P.get(0))); // fake the procedure
-		A.add(new Activity("b",P.get(0))); // fake the procedure
-		A.add(new Activity("c",P.get(0))); // fake the procedure
-		A.add(new Activity("d",P.get(0))); // fake the procedure
-		A.add(new Activity("e",P.get(0))); // fake the procedure
-		A.add(new Activity("f",P.get(0))); // fake the procedure
-		A.add(new Activity("g",P.get(0))); // fake the procedure
-		A.add(new Activity("a_merge_b_c",P.get(0))); // fake the procedure
-		A.add(new Activity("b_split_a",P.get(0))); // fake the procedure
-		A.add(new Activity("c_split_a",P.get(0))); // fake the procedure
-		A.add(new Activity("b_merge_d_e",P.get(0))); // fake the procedure
-		A.add(new Activity("c_merge_g",P.get(0))); // fake the procedure
-		A.add(new Activity("d_split_b",P.get(0))); // fake the procedure
-		A.add(new Activity("e_split_b",P.get(0))); // fake the procedure
-		A.add(new Activity("d_merge_f",P.get(0))); // fake the procedure
-		A.add(new Activity("e_merge_f",P.get(0))); // fake the procedure
-		A.add(new Activity("d_e_split_f",P.get(0))); // fake the procedure
-		A.add(new Activity("f_merge_g",P.get(0))); // fake the procedure
-		A.add(new Activity("f_c_split_g",P.get(0))); // fake the procedure
-		
-		
-		
-		
-		
-		return A;
+		AList = ActivityDAO.getActivityList(PMList, Conn);
+		return AList;
 	}
 	
-	public ArrayList<ActivityInstance> getActivityInstanceList(ArrayList<Activity> A, ArrayList<ProcessInstance> PI){
-		ArrayList<ActivityInstance> AI = new ArrayList<ActivityInstance>();
+	public ArrayList<ActivityInstance> getActivityInstanceList(ArrayList<Activity> AList, ArrayList<ProcessInstance> PIList) throws SQLException{
+		ArrayList<ActivityInstance> AI;
 		
-		// fetch the activity instances from the DB
+		AI = ActivityInstanceDAO.getActivityInstanceList(AList, PIList, Conn);
 		
-		// for each activity instance find, among all the activities, the one that has the same name as the foreign key has
-		// for each activity instance find, among all the process instances, the one that has the same CaseID as the foreign key has
-		
-		AI.add(new ActivityInstance(0,PI.get(0), A.get(0))); // fake the procedure
-		AI.add(new ActivityInstance(1,PI.get(0), A.get(1))); // fake the procedure
-		AI.add(new ActivityInstance(2,PI.get(0), A.get(2))); // fake the procedure
-		AI.add(new ActivityInstance(3,PI.get(0), A.get(3))); // fake the procedure
-		AI.add(new ActivityInstance(4,PI.get(0), A.get(4))); // fake the procedure
-		AI.add(new ActivityInstance(5,PI.get(0), A.get(5))); // fake the procedure
-		AI.add(new ActivityInstance(6,PI.get(0), A.get(6))); // fake the procedure
-		
-		AI.add(new ActivityInstance(6,PI.get(1), A.get(0))); // fake the procedure
-		AI.add(new ActivityInstance(7,PI.get(1), A.get(1))); // fake the procedure
-		AI.add(new ActivityInstance(8,PI.get(0), A.get(2))); // fake the procedure
-		AI.add(new ActivityInstance(9,PI.get(0), A.get(3))); // fake the procedure
-		AI.add(new ActivityInstance(10,PI.get(0), A.get(4))); // fake the procedure
-		AI.add(new ActivityInstance(11,PI.get(0), A.get(5))); // fake the procedure
-		AI.add(new ActivityInstance(12,PI.get(0), A.get(6))); // fake the procedure
 		
 		return AI;
 	}
 	
-	public ArrayList<Event> getEventList(ArrayList<ProcessInstance> PI, ArrayList<ActivityInstance> AI){
-		ArrayList<Event> E = new ArrayList<Event>();
+	public ArrayList<Event> getEventList(ArrayList<ProcessInstance> PIList, ArrayList<ActivityInstance> AIList) throws SQLException{
+		ArrayList<Event> EList;
 		
-		// fetch the events from the DB
+		EList = EventDAO.getEventList(PIList,AIList,Conn);
+	
 		
-		// for each event find, among all the process instances, the one that has the same CaseID as the foreign key has
-		// for each event find, among all the activity instances, the one that has the same ID as the foreign key has
-		
-		E.add(new Event(0,0,"dmi",PI.get(0),AI.get(0))); // fake the procedure
-		E.add(new Event(1,1,"dmi",PI.get(0),AI.get(1))); // fake the procedure
-		E.add(new Event(2,2,"dmi",PI.get(0),AI.get(2))); // fake the procedure
-		E.add(new Event(3,3,"dmi",PI.get(0),AI.get(3))); // fake the procedure
-		E.add(new Event(4,4,"dmi",PI.get(0),AI.get(4))); // fake the procedure
-		E.add(new Event(5,5,"dmi",PI.get(0),AI.get(5))); // fake the procedure
-		E.add(new Event(6,6,"dmi",PI.get(0),AI.get(6))); // fake the procedure
-		
-		E.add(new Event(6,0,"dmi",PI.get(1),AI.get(7))); // fake the procedure
-		E.add(new Event(7,3,"dmi",PI.get(1),AI.get(8))); // fake the procedure
-		E.add(new Event(8,2,"dmi",PI.get(1),AI.get(9))); // fake the procedure
-		E.add(new Event(9,1,"dmi",PI.get(1),AI.get(10))); // fake the procedure
-		E.add(new Event(10,5,"dmi",PI.get(1),AI.get(11))); // fake the procedure
-		E.add(new Event(11,4,"dmi",PI.get(1),AI.get(12))); // fake the procedure
-		E.add(new Event(12,6,"dmi",PI.get(1),AI.get(13))); // fake the procedure
-		
-		return E;
+		return EList;
 	}
-	public ArrayList<ProcessInstance> getProcessInstanceList(ArrayList<ProcessModel> PM){
+	public ArrayList<ProcessInstance> getProcessInstanceList(ArrayList<ProcessModel> PMList) throws SQLException{
 		
-		ArrayList<ProcessInstance> PI = new ArrayList<ProcessInstance>();
+		ArrayList<ProcessInstance> PIList;
 		
-		// fetch the process instances from the DB
 		
-		// for each process instance find, among all the process models, the one that has the same name as the foreign key has
+		PIList = ProcessInstanceDAO.getProcessInstanceList(Conn, PMList);
 		
-		PI.add(new ProcessInstance(0, PM.get(0))); // fake the procedure
-		PI.add(new ProcessInstance(1, PM.get(0))); // fake the procedure
-		
-		return PI;
+		return PIList;
 		
 	}
 	
 	
-	void insertEvent(Event E){};
+	void insertEvent(int Timestamp, String Resource, int CaseID, String AIAct, String PMName) throws SQLException{
+		
+		insertProcessInstance(CaseID,PMName);
+		
+		
+		insertActivityInstance(AIAct,CaseID);
+		ArrayList<ProcessModel> PMList = getProcessList();
+		ArrayList<Activity> AList = getActivityList(PMList);
+		ArrayList<ProcessInstance> PIList = getProcessInstanceList(PMList);
+		ArrayList<ActivityInstance> AIList = getActivityInstanceList(AList, PIList);
+		int ActID = AIList.get(AIList.size()-1).getID();
+		
+		EventDAO.insertEvent(Timestamp,Resource,CaseID,ActID, Conn);
+	};
+	void insertProcess(String PMName) throws SQLException {
+		ProcessDAO.insertProcessModel(PMName, Conn);
+	};
+	void insertActivity(String AName, String PMName) throws SQLException {
+		ProcessModel PM = new ProcessModel(PMName);
+		Activity A = new Activity(AName, PM);
+		ActivityDAO.insertActivity(A, Conn);
+	};
+	void insertProcessInstance(int CaseID, String PM) throws SQLException {
+		ArrayList<ProcessModel> PMList = getProcessList();
+		ProcessInstanceDAO.insertProcessInstance(CaseID,PM,PMList, Conn);
+	};
+	void insertActivityInstance(String AIAct, int CaseID) throws SQLException {
+		ActivityInstanceDAO.insertActivityInstance(AIAct, CaseID, Conn);
+	};
+	
+	
+	public static void main(String[] args) {
+		DBFacade DBF = new DBFacade();
+		try {
+			
+			DBF.insertEvent(0, "dmi", 3, "a", "trial_bpmn");
+			
+			ArrayList<ProcessModel> PMList = DBF.getProcessList();
+			System.out.println("Processes:");
+			for(int i=0; i<PMList.size(); i++)
+				System.out.println(PMList.get(i).getName());
+			System.out.println();
+			ArrayList<Activity> AList = DBF.getActivityList(PMList);
+			System.out.println("Activities:");
+			for(int i=0; i<AList.size(); i++)
+				System.out.println(AList.get(i).getName() + " " + AList.get(i).getPM().getName());
+			System.out.println();
+			ArrayList<ProcessInstance> PIList = DBF.getProcessInstanceList(PMList);
+			System.out.println("Process instances:");
+			for(int i=0; i<PIList.size(); i++)
+				System.out.println(PIList.get(i).getCaseID() + " " + PIList.get(i).getP().getName());
+			System.out.println();
+			
+			ArrayList<ActivityInstance> AIList = DBF.getActivityInstanceList(AList, PIList);
+			System.out.println("Activity instances:");
+			for(int i=0; i<AIList.size(); i++)
+				System.out.println(AIList.get(i).getID() + " " + AIList.get(i).getPI().getCaseID() + " " + AIList.get(i).getA().getName());
+			System.out.println();
+			
+			ArrayList<Event> EList = DBF.getEventList(PIList, AIList);
+			System.out.println("Events:");
+			for(int i=0;i<EList.size(); i++)
+				System.out.println(EList.get(i).getID() + " " + EList.get(i).getT() + " " + EList.get(i).getResource() + " "+ EList.get(i).getPI().getCaseID() + " "+ EList.get(i).getAI().getID());
+			System.out.println();
+			
+			
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 }
