@@ -1,6 +1,7 @@
 package PMLogic;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import DatabaseAccess.DBFacade;
@@ -18,7 +19,7 @@ private
 	
 public
 	Checker(){}
-	void initializeDBDataStructures(DBFacade DBF) {
+	void initializeDBDataStructures(DBFacade DBF) throws SQLException {
 		P = DBF.getProcessList();
 		A = DBF.getActivityList(P);
 		PI = DBF.getProcessInstanceList(P);
@@ -30,7 +31,7 @@ public
 		PN = FSF.getPetriNet(PM, A);
 		BPMN_model = FSF.getBPMN(PM, A);
 	}
-	ArrayList<Trace> onlineConformanceChecking(int TotalEventsNumber) throws FileNotFoundException, IOException{
+	ArrayList<Trace> onlineConformanceChecking(int TotalEventsNumber) throws FileNotFoundException, IOException, SQLException{
 		if(TotalEventsNumber == 0) {
 			return null;
 		}
@@ -58,7 +59,7 @@ public
 			}
 			
 			for(int i = 0; i<found_PM.size(); i++) {
-				FileSystemFacade FSF = FileSystemFacade.getInstance("C:\\Users\\aceep\\OneDrive\\Desktop\\File_progetto", "trial_bpmn");
+				FileSystemFacade FSF = FileSystemFacade.getInstance("C:\\Users\\aceep\\OneDrive\\Desktop\\Files", "trial_bpmn");
 				initializeFSDataStructures(FSF,found_PM.get(i));
 				
 				/*ArrayList<String> P = PN.getPlaces();
@@ -105,8 +106,13 @@ public
 				}
 			}
 			for(int i=0; i<CDL.size(); i++)
-				for(int j=0; j<CDL.get(i).getT().size(); j++)
+				for(int j=0; j<CDL.get(i).getT().size(); j++) {
 					ReturnedTraces.add(CDL.get(i).getT().get(j));
+					
+				}
+			/*for(int i=0; i<ReturnedTraces.size(); i++)
+				for(int j=0; j<ReturnedTraces.get(i).getAI().size(); j++)
+					System.out.println(ReturnedTraces.get(i).getAI().get(j));*/
 			return ReturnedTraces;
 		}
 	}
@@ -172,8 +178,7 @@ public
 			if(isComplete(ExtractedTrace)) {
 				BuiltTraces.add(ExtractedTrace);
 				Trace ExtractedModifiedTrace = modifyTrace(ExtractedTrace, PI.get(i));
-				/*for(int j=0; j<ExtractedModifiedTrace.getAI().size(); j++)
-					System.out.print(ExtractedModifiedTrace.getAI().get(j).getName()+" ");*/
+				
 				ModifiedBuiltTraces.add(ExtractedModifiedTrace);
 				}
 		}
@@ -444,7 +449,7 @@ public
 	    return EventListToOrder;
 	}
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) throws FileNotFoundException, IOException, SQLException {
 		Checker C = new Checker();
 		ArrayList<Trace> NonConformantTraces = C.onlineConformanceChecking(1);
 		for(int i=0; i<NonConformantTraces.size(); i++) {

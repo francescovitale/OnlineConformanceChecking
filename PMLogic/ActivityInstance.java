@@ -8,14 +8,14 @@ private
 	Activity A;
 
 public
-	ActivityInstance() {
+	ActivityInstance(ProcessInstance processInstance, Activity activity) {
 		ID = -1;
 		PI = null;
 		E = null;
 		A = null;
 	}
 
-	public ActivityInstance(int ID_in, ProcessInstance PI_in, Activity A_in) {
+	public ActivityInstance(int ID_in,ProcessInstance PI_in, Activity A_in) {
 		ID = ID_in;
 		PI = PI_in;
 		A = A_in;
