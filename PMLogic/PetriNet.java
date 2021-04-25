@@ -29,7 +29,7 @@ public
 		Marking = Marking_in;
 	}
 
-	PetriNet(PetriNet PN){
+	public PetriNet(PetriNet PN){
 		P = new ProcessModel(PN.getP());
 		Places = PN.Places;
 		Transitions = new ArrayList<Activity>(PN.getTransitions());

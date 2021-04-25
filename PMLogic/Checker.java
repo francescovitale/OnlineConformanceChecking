@@ -25,6 +25,9 @@ public
 		PI = DBF.getProcessInstanceList(P);
 		AI = DBF.getActivityInstanceList(A, PI);
 		E = DBF.getEventList(PI,AI);
+		for(int i=0;i<E.size(); i++)
+			System.out.print(E.get(i).getAI().getA().getName() + " ");
+		System.out.println();
 		
 	}
 	void initializeFSDataStructures(FileSystemFacade FSF, ProcessModel PM) throws FileNotFoundException, IOException {
@@ -59,9 +62,8 @@ public
 			}
 			
 			for(int i = 0; i<found_PM.size(); i++) {
-				FileSystemFacade FSF = FileSystemFacade.getInstance("C:\\Users\\aceep\\OneDrive\\Desktop\\Files", "trial_bpmn");
+				FileSystemFacade FSF = FileSystemFacade.getInstance("C:\\Users\\aceep\\OneDrive\\Desktop\\Files\\StartOfMission", "start_of_mission");
 				initializeFSDataStructures(FSF,found_PM.get(i));
-				
 				/*ArrayList<String> P = PN.getPlaces();
 				PN.updateMarking(P, null);
 				for(int j=0;j<PN.getMarking().size();j++) {
@@ -175,6 +177,7 @@ public
 		for(int i=0; i<PI.size(); i++)
 		{
 			Trace ExtractedTrace = orderEvents(PI.get(i).getCaseID());
+			
 			if(isComplete(ExtractedTrace)) {
 				BuiltTraces.add(ExtractedTrace);
 				Trace ExtractedModifiedTrace = modifyTrace(ExtractedTrace, PI.get(i));
@@ -207,6 +210,9 @@ public
 		ArrayList<Event> TempEvent = new ArrayList<Event>(E);
 		boolean found = false;
 		
+		for(int i=0;i<E.size(); i++)
+			System.out.print(E.get(i).getAI().getA().getName() + " ");
+		System.out.println();
 		
 		do {
 			
@@ -223,7 +229,9 @@ public
 			}
 		} while(found == true);
 		
-		
+		for(int i=0;i<EventListToOrder.size(); i++)
+			System.out.print(EventListToOrder.get(i).getAI().getA().getName() + " ");
+		System.out.println();
 		EventListToOrder = sort(EventListToOrder);
 		
 		ArrayList<ActivityInstance> OrderedAIArray = new ArrayList<ActivityInstance>();
@@ -231,12 +239,15 @@ public
 			OrderedAIArray.add(EventListToOrder.get(i).getAI());
 		}
 		BuiltTrace.setAI(OrderedAIArray);
+		for(int i = 0; i<BuiltTrace.getAI().size(); i++)
+			System.out.print(BuiltTrace.getAI().get(i).getA().getName()+ " ");
+		System.out.println();
 		
 		return BuiltTrace;
 	}
 	Trace modifyTrace(Trace BaseTrace, ProcessInstance PIToAssign) {
 		Trace ModifiedTrace = new Trace(BaseTrace);
-		
+		int count;
 		
 		ArrayList<SplitRelation> RetrievedSR = BPMN_model.getSR();
 		ArrayList<MergeRelation> RetrievedMR = BPMN_model.getMR();
@@ -249,6 +260,7 @@ public
 				System.out.print(RetrievedSR.get(i).getSuccessiveActivities().get(j).getName()+" ");
 			System.out.println();
 		}
+		boolean skip = false;
 		for(int i=0; i<RetrievedSR.size(); i++) {
 			// every iteration considers a single split relation, which has a single precedent activity and multiple possible successive activities
 			Activity PrecedentActivity = RetrievedSR.get(i).getPrecedentActivity();
@@ -256,13 +268,17 @@ public
 			boolean found = false;
 			int previousindex = -1;
 			int successiveindex = -1;
+			
+			count = 0;
 			for(int j=0; j<ModifiedTrace.getAI().size(); j++) {
 				if(ModifiedTrace.getAI().get(j).getA().getName().equals(PrecedentActivity.getName())) {
+					
 					boolean found_internal = false;
 					int k = 0;
 					do {
 						if(ModifiedTrace.getAI().get(j+1).getA().getName().equals(SuccessiveActivities.get(k).getName())) {
 							found_internal = true;
+							count++;
 						}
 						k++;
 					}while(found_internal == false && k<SuccessiveActivities.size());
@@ -273,9 +289,10 @@ public
 						successiveindex = j+1;
 						System.out.println("Split relation no. " + i + " found. previous index = " + previousindex + ", successive index = "+ successiveindex);
 						found = true;
+						if(skip==true)
+							j = ModifiedTrace.getAI().size();
+						
 					}
-					
-					
 					
 				}
 			}
@@ -300,6 +317,12 @@ public
 					
 				}
 			}
+			if(count>1) {
+				skip=true;
+				i--;
+			}
+			else
+				skip=false;
 			
 		}
 		for(int i=0; i<RetrievedMR.size(); i++)
@@ -311,11 +334,13 @@ public
 				System.out.print(RetrievedMR.get(i).getPrecedentActivities().get(j).getName()+" ");
 			System.out.println();
 		}
+		skip=false;
 		for(int i=0; i<RetrievedMR.size(); i++) {
 			// every iteration considers a single split relation, which has a single precedent activity and multiple possible successive activities
 			Activity SuccessiveActivity = RetrievedMR.get(i).getSuccessiveActivity();
 			ArrayList<Activity> PrecedentActivities = RetrievedMR.get(i).getPrecedentActivities();
 			boolean found = false;
+			count = 0;
 			int previousindex = -1;
 			int successiveindex = -1;
 			for(int j=0; j<ModifiedTrace.getAI().size(); j++) {
@@ -325,6 +350,7 @@ public
 					do {
 						if(ModifiedTrace.getAI().get(j-1).getA().getName().equals(PrecedentActivities.get(k).getName())) {
 							found_internal = true;
+							count++;
 						}
 						k++;
 					}while(found_internal == false && k<PrecedentActivities.size());
@@ -335,7 +361,10 @@ public
 						successiveindex = j;
 						System.out.println("Merge relation no. " + i + " found. previous index = " + previousindex + ", successive index = "+ successiveindex);
 						found = true;
+						if(skip==true)
+							j = ModifiedTrace.getAI().size();
 					}
+					
 				}
 			}
 			System.out.println("Found: " + found);
@@ -365,6 +394,12 @@ public
 					
 				}
 			}
+			if(count>1) {
+				skip=true;
+				i--;
+			}
+			else
+				skip=false;
 			
 		}
 		
@@ -383,12 +418,13 @@ public
 				MergeActivityName = MergeActivityName+"_";
 		}
 		
-		
+		System.out.println(MergeActivityName);
 		ActivityInstance MergeActivity = null;
 		for(int i=0; i<A.size(); i++)
 			if(A.get(i).getName().equals(MergeActivityName))
 				MergeActivity = new ActivityInstance(-1,PIToAssign,A.get(i));
 		
+		System.out.println(MergeActivity.getA().getName());
 		
 		ActivityInstance SplitActivity = null;
 		for(int i=0; i<A.size(); i++)
@@ -414,11 +450,14 @@ public
 				SplitActivityName = SplitActivityName + "_";
 		}
 		
+		
+		
 		ActivityInstance SplitActivity = null;
 		for(int i=0; i<A.size(); i++)
 			if(A.get(i).getName().equals(SplitActivityName+"_split_"+SuccActivity))
 				SplitActivity = new ActivityInstance(-1,PIToAssign,A.get(i));
-		
+		System.out.println(SplitActivityName+"_split_"+SuccActivity);
+		System.out.println(SplitActivity.getA().getName());
 		
 		ActivityInstance MergeActivity = null;
 		for(int i=0; i<A.size(); i++)
@@ -434,12 +473,15 @@ public
 	}
 	
 	ArrayList<Event> sort(ArrayList<Event> EventListToOrder){
-		
+		//for(int i=0;i<EventListToOrder.size(); i++)
+		//	System.out.print(EventListToOrder.get(i).getAI().getA().getName() + " ");
+		//System.out.println();
 		int n = EventListToOrder.size();
 	    for (int i = 1; i < n; ++i) {
 	        Event key = EventListToOrder.get(i);
 	        int j = i - 1;
 	        while (j >= 0 && EventListToOrder.get(j).getT() > key.getT()) {
+	        	//System.out.println("key: " + key.getAI().getA().getName() + "T:" + key.getT() +", EventListToOrder.get(j):" + EventListToOrder.get(j).getAI().getA().getName() + "T:" + EventListToOrder.get(j).getT());
 	        	EventListToOrder.set(j+1, EventListToOrder.get(j));
 	            j = j - 1;
 	        }
