@@ -117,7 +117,53 @@ public
 		DBFacade DBF = new DBFacade();
 		try {
 			
-			DBF.insertEvent(0, "dmi", 3, "a", "trial_bpmn");
+			DBF.insertEvent(0, "dmi", 0, "som_start", "StartOfMission");
+			DBF.insertEvent(1, "dmi", 0, "som_enterid_dmi_1", "StartOfMission");
+			DBF.insertEvent(2, "evc", 0, "som_storeid_evc_1", "StartOfMission");
+			DBF.insertEvent(3, "evc", 0, "som_validate_evc_1", "StartOfMission");
+			DBF.insertEvent(4, "rtm", 0, "som_openconn_rtm_1", "StartOfMission");
+			DBF.insertEvent(5, "rbc", 0, "som_checkpos_rbc_1", "StartOfMission");
+			DBF.insertEvent(6, "rbc", 0, "som_storepos_rbc_1", "StartOfMission");
+			DBF.insertEvent(7, "rbc", 0, "som_storevalacc_rbc_1", "StartOfMission");
+			DBF.insertEvent(8, "evc", 0, "som_storeacc_evc_1", "StartOfMission");
+			DBF.insertEvent(9, "dmi", 0, "som_driversel_dmi_1", "StartOfMission");
+			DBF.insertEvent(10, "dmi", 0, "som_inserttraindata_dmi_1", "StartOfMission");
+			DBF.insertEvent(11, "rtm", 0, "som_checkrbcsess_rtm_1", "StartOfMission");
+			DBF.insertEvent(12, "dmi", 0, "som_selstart_dmi_1", "StartOfMission");
+			DBF.insertEvent(13, "rtm", 0, "som_sendMAreq_rtm_1", "StartOfMission");
+			DBF.insertEvent(14, "rbc", 0, "som_checktrainroute_rbc_1", "StartOfMission");
+			DBF.insertEvent(15, "rbc", 0, "som_checkval_rbc_1", "StartOfMission");
+			DBF.insertEvent(16, "rbc", 0, "som_grantFS_rbc_1", "StartOfMission");
+			DBF.insertEvent(17, "dmi", 0, "som_awaitack_dmi_1", "StartOfMission");
+			DBF.insertEvent(18, "evc", 0, "som_chmod_evc_2", "StartOfMission");
+			DBF.insertEvent(19, "dmi", 0, "som_end", "StartOfMission");
+			
+			/*DBF.insertEvent(0, "dmi", 1, "som_start", "StartOfMission");
+			DBF.insertEvent(1, "dmi", 1, "som_enterid_dmi_1", "StartOfMission");
+			DBF.insertEvent(2, "dmi", 1, "som_retry_dmi_1", "StartOfMission");
+			DBF.insertEvent(3, "dmi", 1, "som_enterid_dmi_1", "StartOfMission");
+			DBF.insertEvent(4, "evc", 1, "som_storeid_evc_1", "StartOfMission");
+			DBF.insertEvent(5, "evc", 1, "som_validate_evc_1", "StartOfMission");
+			DBF.insertEvent(6, "rtm", 1, "som_openconn_rtm_1", "StartOfMission");
+			DBF.insertEvent(7, "evc", 1, "som_giveup_evc_1", "StartOfMission");
+			DBF.insertEvent(8, "dmi", 1, "som_driversel_dmi_1", "StartOfMission");
+			DBF.insertEvent(9, "evc", 1, "som_NLSHproc_evc_1", "StartOfMission");
+			DBF.insertEvent(10, "evc", 1, "som_chmod_evc_1", "StartOfMission");
+			DBF.insertEvent(11, "dmi", 1, "som_end", "StartOfMission");*/
+			
+			/*DBF.insertEvent(0, "dmi", 2, "som_start", "StartOfMission");
+			DBF.insertEvent(1, "dmi", 2, "som_enterid_dmi_1", "StartOfMission");
+			DBF.insertEvent(2, "evc", 2, "som_storeid_evc_1", "StartOfMission");
+			DBF.insertEvent(3, "evc", 2, "som_validate_evc_1", "StartOfMission");
+			DBF.insertEvent(4, "rtm", 2, "som_openconn_rtm_1", "StartOfMission");
+			DBF.insertEvent(5, "dmi", 2, "som_retry_dmi_2", "StartOfMission");
+			DBF.insertEvent(6, "rtm", 2, "som_openconn_rtm_1", "StartOfMission");
+			DBF.insertEvent(7, "evc", 2, "som_giveup_evc_1", "StartOfMission");
+			DBF.insertEvent(8, "dmi", 2, "som_driversel_dmi_1", "StartOfMission");
+			DBF.insertEvent(9, "evc", 2, "som_NLSHproc_evc_1", "StartOfMission");
+			DBF.insertEvent(10, "evc", 2, "som_chmod_evc_1", "StartOfMission");
+			DBF.insertEvent(11, "dmi", 2, "som_end", "StartOfMission");*/
+			
 			
 			ArrayList<ProcessModel> PMList = DBF.getProcessList();
 			System.out.println("Processes:");
@@ -144,7 +190,7 @@ public
 			ArrayList<Event> EList = DBF.getEventList(PIList, AIList);
 			System.out.println("Events:");
 			for(int i=0;i<EList.size(); i++)
-				System.out.println(EList.get(i).getID() + " " + EList.get(i).getT() + " " + EList.get(i).getResource() + " "+ EList.get(i).getPI().getCaseID() + " "+ EList.get(i).getAI().getID());
+				System.out.println(EList.get(i).getID() + " " + EList.get(i).getT() + " " + EList.get(i).getResource() + " "+ EList.get(i).getPI().getCaseID() + " "+ EList.get(i).getAI().getA().getName());
 			System.out.println();
 			
 			
