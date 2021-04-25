@@ -25,7 +25,9 @@ public
 			Activity Prec = null;
 			for(int i=0;i<A.size(); i++)
 				if(A.get(i).getName().equals(SplitRelationParts[0]))
+				{
 					Prec = A.get(i);
+				}
 			ArrayList<Activity> Succ = new ArrayList<Activity>();
 			for(int i=0; i<SplitRelationSuccActivities.length; i++) {
 				for(int j=0; j<A.size(); j++)

@@ -1,8 +1,10 @@
 package FileSystemAccess;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
+import DatabaseAccess.DBFacade;
 import PMLogic.*;
 
 public class FileSystemFacade {
@@ -38,15 +40,31 @@ public class FileSystemFacade {
 		return BPMN_model;
 	}
 	
-	/*public static void main(String[] args) throws FileNotFoundException, IOException {
-		ProcessModel PM = new ProcessModel("trial_bpmn");
-		/*FileSystemFacade MyFSF = FileSystemFacade.getInstance("C:\\Users\\aceep\\OneDrive\\Desktop\\File_progetto", "trial_bpmn");
-		PetriNet PN = new PetriNet(MyFSF.getPetriNet(PM));
-		for(int i=0;i<PN.getMarking().size(); i++)
-			System.out.println(PN.getMarking().get(PN.getPlaces().get(i)));*/
-		/*
-		FileSystemFacade MyFSF = FileSystemFacade.getInstance("C:\\Users\\aceep\\OneDrive\\Desktop\\File_progetto", "trial_bpmn");
-		BPMN BPMN_model = new BPMN(MyFSF.getBPMN(PM));
+	public static void main(String[] args) throws FileNotFoundException, IOException, SQLException {
+		ProcessModel PM = new ProcessModel("start_of_mission");
+		DBFacade DBF = new DBFacade();
+		ArrayList<ProcessModel> PMList = DBF.getProcessList();
+		ArrayList<Activity> AList = DBF.getActivityList(PMList);
+		
+		FileSystemFacade MyFSF = FileSystemFacade.getInstance("C:\\Users\\aceep\\OneDrive\\Desktop\\Files\\StartOfMission", "start_of_mission");
+		PetriNet PN = MyFSF.getPetriNet(PM, AList);
+		for(int i=0;i<PN.getPlaces().size(); i++)
+			System.out.print(PN.getPlaces().get(i)+" ");
+		System.out.println();
+		for(int i=0;i<PN.getTransitions().size();i++)
+			System.out.print(PN.getTransitions().get(i).getName()+" ");
+		System.out.println();
+		for(int i=0;i<PN.getTransitions().size();i++)
+		{
+			System.out.println();
+			for(int j=0; j<PN.getPlaces().size();j++) {
+				//if(PN.getTP().get(PN.getPlaces().get(j), PN.getTransitions().get(i).getName()) == null)
+					System.out.print(PN.getTP().get(PN.getPlaces().get(j), PN.getTransitions().get(i).getName()) + " ");
+			}
+		}
+		
+		
+		BPMN BPMN_model = MyFSF.getBPMN(PM,AList);
 		for(int i=0;i<BPMN_model.getSR().size(); i++) {
 			System.out.println("Precedent activity: "+BPMN_model.getSR().get(i).getPrecedentActivity().getName());
 			System.out.print("Successive activities: ");
@@ -54,6 +72,14 @@ public class FileSystemFacade {
 				System.out.print(BPMN_model.getSR().get(i).getSuccessiveActivities().get(j).getName()+" ");
 			System.out.println();
 		}
-	}*/
+		System.out.println();
+		for(int i=0;i<BPMN_model.getMR().size(); i++) {
+			System.out.println("Successive activity: "+BPMN_model.getMR().get(i).getSuccessiveActivity().getName());
+			System.out.print("Precedent activities: ");
+			for(int j=0;j<BPMN_model.getMR().get(i).getPrecedentActivities().size();j++)
+				System.out.print(BPMN_model.getMR().get(i).getPrecedentActivities().get(j).getName()+" ");
+			System.out.println();
+		}
+	}
 	
 }
