@@ -1,9 +1,10 @@
 package FileSystemAccess;
-import PMLogic.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import PMLogic.*;
 
 public class BPMNReader {
 private

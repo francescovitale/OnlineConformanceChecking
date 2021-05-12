@@ -1,6 +1,5 @@
 package FileSystemAccess;
 
-import PMLogic.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,6 +10,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+
+import PMLogic.*;
 
 public class PetriNetReader {
 	private String ProcessName;
